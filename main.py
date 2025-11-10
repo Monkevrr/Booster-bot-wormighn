@@ -8,7 +8,8 @@ import webserver
 DISCORD_TOKEN = os.environ['discordkey']
 PLAYFAB_TITLE_ID = '4C42F'
 PLAYFAB_SECRET_KEY = 'BO51N5M7O7MEEGOUOAK8BZEBO9K7F4WOKRTECE9M56OACZAXI9'
-ALLOWED_SERVER_ID = 1374731642094227488
+ALLOWED_SERVER_ID = 1319882768989163532
+ALLOWED_CHANNEL_ID = 1374731642094227488
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -37,10 +38,10 @@ async def grant_playfab_item(playfab_id: str, item_id: str):
             result = await response.json()
             return result
 
-def is_correct_server():
-    """Check if command is used in the correct server"""
+def is_correct_server_and_channel():
+    """Check if command is used in the correct server and channel"""
     async def predicate(interaction: discord.Interaction) -> bool:
-        if interaction.guild and interaction.guild.id == ALLOWED_SERVER_ID:
+        if interaction.guild and interaction.guild.id == ALLOWED_SERVER_ID and interaction.channel_id == ALLOWED_CHANNEL_ID:
             return True
         return False
     return app_commands.check(predicate)
@@ -66,7 +67,7 @@ async def on_ready():
 
 @bot.tree.command(name="iboosted", description="Claim your Boobundle cosmetic for boosting the server!")
 @app_commands.describe(playfab_id="Your PlayFab ID")
-@is_correct_server()
+@is_correct_server_and_channel()
 @has_server_booster_role()
 async def iboosted(interaction: discord.Interaction, playfab_id: str):
     """Grant Boobundle cosmetic to Server Boosters"""
@@ -93,7 +94,7 @@ async def iboosted(interaction: discord.Interaction, playfab_id: str):
 async def iboosted_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.CheckFailure):
         # Check which check failed
-        if interaction.guild and interaction.guild.id != ALLOWED_SERVER_ID:
+        if not interaction.guild or interaction.guild.id != ALLOWED_SERVER_ID or interaction.channel_id != ALLOWED_CHANNEL_ID:
             await interaction.response.send_message(
                 "❌ ur a bad boy",
                 ephemeral=True
