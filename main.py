@@ -96,7 +96,7 @@ async def iboosted_error(interaction: discord.Interaction, error: app_commands.A
         # Check which check failed
         if not interaction.guild or interaction.guild.id != ALLOWED_SERVER_ID or interaction.channel_id != ALLOWED_CHANNEL_ID:
             await interaction.response.send_message(
-                "❌ ur a bad boy",
+                "❌ u Need to be in the booster chat or ur using this bot somehow in a another server",
                 ephemeral=True
             )
         else:
@@ -107,3 +107,4 @@ async def iboosted_error(interaction: discord.Interaction, error: app_commands.A
 
 webserver.keep_alive()
 bot.run(DISCORD_TOKEN)
+
